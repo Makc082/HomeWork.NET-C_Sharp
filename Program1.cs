@@ -18,115 +18,140 @@ class Student
     private int[] coursework;
     private int[] exams;
 
-    // конструктор без параметрів.
-    public Student()
-    {
-        name = "";
-        middleName = "";
-        lastName = "";
-        dateOfBirth = DateTime.MinValue;
-        address = "";
-        phoneNumber = "";
-        credits = new int[0];
-        coursework = new int[0];
-        exams = new int[0];
-    }
-
-    // конструктор з параметрами.
-    public Student(string name, string middleName, string lastName, DateTime dateOfBirth, string address, string phoneNumber, int[] credits, int[] coursework, int[] exams)
-    {
-        this.name = name;
-        this.middleName = middleName;
-        this.lastName = lastName;
-        this.dateOfBirth = dateOfBirth;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.credits = credits;
-        this.coursework = coursework;
-        this.exams = exams;
-    }
-
-    // конструктор копіювання.
-    public Student(Student other)
-    {
-        name = other.name;
-        middleName = other.middleName;
-        lastName = other.lastName;
-        dateOfBirth = other.dateOfBirth;
-        address = other.address;
-        phoneNumber = other.phoneNumber;
-        credits = (int[])other.credits.Clone();
-        coursework = (int[])other.coursework.Clone();
-        exams = (int[])other.exams.Clone();
-    }
-
-    // getter-и та setter-и для всіх полів.
+    //властивості
     public string Name
     {
-        get { return name; }
-        set { name = value; }
+        get => name;
+        set => name = value;
     }
 
     public string MiddleName
     {
-        get { return middleName; }
-        set { middleName = value; }
+        get => middleName;
+        set => middleName = value;
     }
 
     public string LastName
     {
-        get { return lastName; }
-        set { lastName = value; }
+        get => lastName;
+        set => lastName = value;
     }
 
     public DateTime DateOfBirth
     {
-        get { return dateOfBirth; }
-        set { dateOfBirth = value; }
+        get => dateOfBirth;
+        set => dateOfBirth = value;
+    }
+
+    // вік обчислюється автоматично
+    public int Age => DateTime.Now.Year - dateOfBirth.Year;
+
+    // середній бал 
+    public double AverageGrade
+    {
+        get
+        {
+            if (exams.Length == 0) return 0;
+            double sum = 0;
+            foreach (var e in exams) sum += e;
+            return sum / exams.Length;
+        }
     }
 
     public string Address
     {
-        get { return address; }
-        set { address = value; }
+        get => address;
+        set => address = value;
     }
 
     public string PhoneNumber
     {
-        get { return phoneNumber; }
-        set { phoneNumber = value; }
+        get => phoneNumber;
+        set => phoneNumber = value;
     }
 
     public int[] Credits
     {
-        get { return credits; }
-        set { credits = value; }
+        get => credits;
+        set => credits = value;
     }
 
     public int[] Coursework
     {
-        get { return coursework; }
-        set { coursework = value; }
+        get => coursework;
+        set => coursework = value;
     }
 
     public int[] Exams
     {
-        get { return exams; }
-        set { exams = value; }
+        get => exams;
+        set => exams = value;
     }
 
-    //показ даних студента.
+    // конструктор без параметрів.
+    public Student() : this("", "", "", DateTime.MinValue, "", "",
+                            new int[0], new int[0], new int[0])
+    {
+    }
+
+
+    // конструктор з параметрами.
+    public Student(string name, string middleName, string lastName,
+                   DateTime dateOfBirth, string address, string phoneNumber,
+                   int[] credits, int[] coursework, int[] exams)
+    {
+        Name = name;
+        MiddleName = middleName;
+        LastName = lastName;
+        DateOfBirth = dateOfBirth;
+        Address = address;
+        PhoneNumber = phoneNumber;
+        Credits = credits;
+        Coursework = coursework;
+        Exams = exams;
+    }
+
+    // конструктор копіювання.
+    public Student(Student other)
+        : this(
+            other.Name,
+            other.MiddleName,
+            other.LastName,
+            other.DateOfBirth,
+            other.Address,
+            other.PhoneNumber,
+            (int[])other.Credits.Clone(),
+            (int[])other.Coursework.Clone(),
+            (int[])other.Exams.Clone()
+          )
+    {
+
+    }
+
+    //перевантаження операторів.
+    public static bool operator ==(Student s1, Student s2)
+    {
+        if (ReferenceEquals(s1, s2)) return true;
+        if (s1 is null || s2 is null) return false;
+        return s1.AverageGrade == s2.AverageGrade;
+    }
+
+    public static bool operator !=(Student s1, Student s2) => !(s1 == s2);
+
+    // перевизначення методів Equals і GetHashCode
+    public override bool Equals(object obj)
+    {
+        if (obj is Student other)
+            return this == other;
+        return false;
+    }
+
+    public override int GetHashCode() => AverageGrade.GetHashCode();
+
+    // ToString
     public override string ToString()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"Name: {name} {middleName} {lastName}");
-        sb.AppendLine($"Date of Birth: {dateOfBirth.ToShortDateString()}");
-        sb.AppendLine($"Address: {address}");
-        sb.AppendLine($"Phone Number: {phoneNumber}");
-        sb.AppendLine($"Credits: {string.Join(", ", credits)}");
-        sb.AppendLine($"Coursework: {string.Join(", ", coursework)}");
-        sb.AppendLine($"Exams: {string.Join(", ", exams)}");
-        return sb.ToString();
+        return $"{LastName} {Name} | Бал: {AverageGrade:F1}";
     }
 }
 
@@ -138,82 +163,109 @@ class Group
     private string faculty;
     private int courseNumber;
 
-    // конструктор без параметрів.
-    public Group()
+    public Student[] Students
     {
-        students = new Student[0];
-        groupName = "";
-        faculty = "";
-        courseNumber = 0;
+        get => students;
+        set => students = value;
+    }
+
+    public string GroupName
+    {
+        get => groupName;
+        set => groupName = value;
+    }
+
+    public string Faculty
+    {
+        get => faculty;
+        set => faculty = value;
+    }
+
+    public int CourseNumber
+    {
+        get => courseNumber;
+        set => courseNumber = value;
+    }
+
+    // властивість для отримання кількості студентів у групі.
+    public int Count => students.Length;
+
+    // індексатор для доступу до студентів за індексом.
+    public Student this[int index]
+    {
+        get => students[index];
+        set => students[index] = value;
+    }
+
+    // конструктор без параметрів.
+    public Group() : this(new Student[0], "", "", 0)
+    {
     }
 
     // конструктор з параметрами.
     public Group(Student[] students, string groupName, string faculty, int courseNumber)
     {
-        this.students = students;
-        this.groupName = groupName;
-        this.faculty = faculty;
-        this.courseNumber = courseNumber;
+        Students = students;
+        GroupName = groupName;
+        Faculty = faculty;
+        CourseNumber = courseNumber;
     }
 
     // конструктор копіювання.
     public Group(Group other)
+        : this(
+            CloneStudents(other.Students),
+            other.GroupName,
+            other.Faculty,
+            other.CourseNumber
+          )
     {
-        students = new Student[other.students.Length];
-        for (int i = 0; i < other.students.Length; i++)
+    }
+
+    // метод для глибокого копіювання масиву студентів.
+    private static Student[] CloneStudents(Student[] arr)
+    {
+        if (arr == null) return new Student[0];
+        Student[] result = new Student[arr.Length];
+        for (int i = 0; i < arr.Length; i++)
         {
-            students[i] = new Student(other.students[i]);
+            // якщо елемент null — залишаємо null, інакше створюємо копію
+            result[i] = arr[i] == null ? null : new Student(arr[i]);
         }
-
-        groupName = other.groupName;
-        faculty = other.faculty;
-        courseNumber = other.courseNumber;
+        return result;
     }
 
-    // getter-и та setter-и для всіх полів.
-    public Student[] Students
+    // перевантаження операторів 
+    public static bool operator ==(Group g1, Group g2)
     {
-        get { return students; }
-        set { students = value; }
+        if (ReferenceEquals(g1, g2)) return true;
+        if (g1 is null || g2 is null) return false;
+        return g1.Count == g2.Count;
     }
 
-    public string GroupName
+    public static bool operator !=(Group g1, Group g2) => !(g1 == g2);
+
+    public override bool Equals(object obj)
     {
-        get { return groupName; }
-        set { groupName = value; }
+        if (obj is Group other)
+            return this == other;
+        return false;
     }
 
-    public string Faculty
-    {
-        get { return faculty; }
-        set { faculty = value; }
-    }
-
-    public int CourseNumber
-    {
-        get { return courseNumber; }
-        set { courseNumber = value; }
-    }
+    public override int GetHashCode() => Count.GetHashCode();
 
     // показ всіх студентів у групі.
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"Group Name: {groupName}");
-        sb.AppendLine($"Faculty: {faculty}");
-        sb.AppendLine($"Course Number: {courseNumber}");
-        sb.AppendLine("Students:");
-
-        if (students == null || students.Length == 0)
-        {
-            sb.AppendLine("Немає студентів.");
-            return sb.ToString();
-        }
-
-        Array.Sort(students, (s1, s2) => string.Compare(s1.LastName, s2.LastName));
+        sb.AppendLine($"Група: {groupName}");
+        sb.AppendLine($"Спеціальність: {faculty}");
+        sb.AppendLine($"Курс: {courseNumber}");
+        sb.AppendLine($"Кількість студентів: {Count}");
+        sb.AppendLine("Студенти:");
 
         for (int i = 0; i < students.Length; i++)
-            sb.AppendLine($"{i + 1}. {students[i].LastName} {students[i].Name}");
+            sb.AppendLine($"{i + 1}. {students[i]}");
 
         return sb.ToString();
     }
@@ -313,6 +365,5 @@ class Program
         Console.WriteLine("\nПісля відрахування тих, хто не склав:");
         Console.WriteLine(g.ToString());
     }
-
-    }
+}
 
