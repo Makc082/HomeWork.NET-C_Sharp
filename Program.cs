@@ -1,198 +1,185 @@
-﻿//середнє арефметичне трьох чисел
-namespace ConsoleApp1
+﻿using System;
+using System.Collections.Generic;
+
+
+// Інтерфейси
+public interface ISpell
 {
-    internal class Program
-    {
-        static void Main()
-        {
-            int a = 15;
-            int b = 20;
-            int c = 25;
-            double average = (a + b + c) / 3.0;
-            Console.WriteLine("Середнє арефметичне трьох чисел: " + average);
-        }
-    }
+    void Cast();
+    int GetPower();
 }
 
-// корінь лінійного рівняння.
-using System.Text;
-
-namespace ConsoleApp1
+// Додатковий інтерфейс для темної магії
+public interface IDarkMagic
 {
-    internal class Program
-    {
-        static void Main()
-        {
-            Console.OutputEncoding = Encoding.UTF8;
+    void DarkEffect();
+}
 
-            double a = 5;
-            double b = 10;
-            if (a != 0)
+// Generic spellbook
+public class Spellbook<T>
+    where T : class, ISpell, IComparable<T>, new()
+{
+    private List<T> spells = new List<T>();
+
+    // Вивчити нове закляття
+    public void LearnSpell(T spell)
+    {
+        foreach (var s in spells)
+        {
+            if (s.CompareTo(spell) == 0)
             {
-                double x = -b / a;
-                Console.WriteLine("Корінь лінійного рівняння: " + x);
-            }
-            else
-            {
-                Console.WriteLine("Рівняння не має розв'язку, оскільки a дорівнює нулю.");
+                Console.WriteLine(" Закляття з такою силою вже вивчене!");
+                return;
             }
         }
+
+        spells.Add(spell);
+        Console.WriteLine($" Вивчено нове закляття (сила: {spell.GetPower()})");
     }
-}
 
-// ступінь. 
-using System;
-using System.Text;
-
-namespace ConsoleApp1
-{
-    internal class Program
+    // Сортування за силою
+    public void SortSpells()
     {
-        static void Main()
+        spells.Sort();
+    }
+
+    // Кастування найсильнішого
+    public void CastStrongest()
+    {
+        if (spells.Count == 0)
         {
-            Console.OutputEncoding = Encoding.UTF8;
+            Console.WriteLine("Книга порожня!");
+            return;
+        }
 
-            Console.Write("Введіть число: ");
-            double number = Convert.ToDouble(Console.ReadLine());
+        SortSpells();
+        var strongest = spells[^1];
 
-            Console.Write("Введіть ступінь: ");
-            double exponent = Convert.ToDouble(Console.ReadLine());
+        Console.WriteLine("\n Кастуємо найсильніше закляття:");
+        strongest.Cast();
+    }
 
-            double result = Math.Pow(number, exponent);
+    // Темний ритуал
+    public void InvokeRitual()
+    {
+        foreach (var spell in spells)
+        {
+            if (spell is not IDarkMagic)
+                throw new InvalidOperationException(
+                    " Ритуал неможливий! Не всі закляття є темною магією.");
+        }
 
-            Console.WriteLine($"{number} у ступені {exponent} дорівнює {result}");
+        Console.WriteLine("\n Темний ритуал розпочато...");
+        foreach (var spell in spells)
+        {
+            ((IDarkMagic)spell).DarkEffect();
         }
     }
 }
 
-//площа і довжина кола.
-using System;   
-using System.Text;
 
-namespace ConsoleApp1
+// Закляття
+
+// Вогняна куля
+public class Fireball : ISpell, IComparable<Fireball>
 {
-    internal class Program
+    public int Power { get; set; } = 70;
+
+    public void Cast()
     {
-        static void Main()
-        {
-            Console.OutputEncoding = Encoding.UTF8;
+        Console.WriteLine(" Fireball: Вибух вогню!");
+    }
 
-            const double Pi = 3.14159;
+    public int GetPower() => Power;
 
-            Console.Write("Введіть радіус кола: ");
-            double radius = Convert.ToDouble(Console.ReadLine());
-            double area = Pi * Math.Pow(radius, 2);
-            double circumference = 2 * Pi * radius;
-
-            Console.WriteLine($"Площа кола: {area}");
-            Console.WriteLine($"Довжина кола: {circumference}");
-
-        }
+    public int CompareTo(Fireball other)
+    {
+        return Power.CompareTo(other.Power);
     }
 }
 
-// гривені в долари і євро.
-using System;
-using System.Text;
-
-namespace ConsoleApp1
+// Відновлення здоров'я
+public class HealingWave : ISpell, IComparable<HealingWave>
 {
-    internal class Program
+    public int Power { get; set; } = 40;
+
+    public void Cast()
     {
-        static void Main()
-        {
-            Console.OutputEncoding = Encoding.UTF8;
+        Console.WriteLine(" Healing Wave: Відновлення здоровʼя!");
+    }
 
-            const double UsdToUahRate = 41.70; // курс долара до гривні
-            const double EurToUahRate = 49.70; // курс євро до гривні
+    public int GetPower() => Power;
 
-            Console.Write("Введіть кількість гривень: ");
-            double uahAmount = Convert.ToDouble(Console.ReadLine());
-
-            double usdAmount = uahAmount / UsdToUahRate;
-            double eurAmount = uahAmount / EurToUahRate;
-
-            Console.WriteLine($"{uahAmount} гривень дорівнює {usdAmount:F2} доларів.");
-            Console.WriteLine($"{uahAmount} гривень дорівнює {eurAmount:F2} євро.");
-        }
+    public int CompareTo(HealingWave other)
+    {
+        return Power.CompareTo(other.Power);
     }
 }
 
-//кілометри в сухопутні і морські милі.
-using System;
-using System.Text;
-
-namespace ConsoleApp1
+// Темне закляття
+public class DarkSpell : ISpell, IDarkMagic, IComparable<DarkSpell>
 {
-    internal class Program
+    public int Power { get; set; }
+
+    public DarkSpell()
     {
-        static void Main()
-        {
-            Console.OutputEncoding = Encoding.UTF8;
+        Power = new Random().Next(80, 120);
+    }
 
-            const double KmToLandMilesRate = 0.621371; // кількість кілометрів до сухопутних миль
-            const double KmToNauticalMilesRate = 0.539957; // кількість кілометрів до морських миль
+    public void Cast()
+    {
+        Console.WriteLine($" Темне закляття кастується (сила {Power})");
+    }
 
-            Console.Write("Введіть кількість кілометрів: ");
-            double kmAmount = Convert.ToDouble(Console.ReadLine());
+    public void DarkEffect()
+    {
+        Console.WriteLine(" Темна енергія поглинає все навколо...");
+    }
 
-            double landMilesAmount = kmAmount * KmToLandMilesRate;
-            double nauticalMilesAmount = kmAmount * KmToNauticalMilesRate;
+    public int GetPower() => Power;
 
-            Console.WriteLine($"{kmAmount} кілометрів дорівнює {landMilesAmount:F2} сухопутних миль.");
-            Console.WriteLine($"{kmAmount} кілометрів дорівнює {nauticalMilesAmount:F2} морських миль.");
-        }
+    public int CompareTo(DarkSpell other)
+    {
+        return Power.CompareTo(other.Power);
     }
 }
 
-// відсоток від числа.
-using System;
-using System.Text;
 
-namespace ConsoleApp1
+// Main
+class Program
 {
-    internal class Program
+    static void Main()
     {
-        static void Main()
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+        Console.WriteLine("===  Звичайна книга заклять ===");
+
+        var fireBook = new Spellbook<Fireball>();
+        fireBook.LearnSpell(new Fireball { Power = 60 });
+        fireBook.LearnSpell(new Fireball { Power = 80 });
+        fireBook.LearnSpell(new Fireball { Power = 80 }); // дубль
+        fireBook.LearnSpell(new Fireball { Power = 50 });
+        fireBook.LearnSpell(new Fireball { Power = 90 });
+
+        fireBook.CastStrongest();
+
+        Console.WriteLine("\n===  Книга темної магії ===");
+
+        var darkBook = new Spellbook<DarkSpell>();
+        darkBook.LearnSpell(new DarkSpell());
+        darkBook.LearnSpell(new DarkSpell());
+        darkBook.LearnSpell(new DarkSpell());
+
+        darkBook.CastStrongest();
+
+        // Темний ритуал
+        try
         {
-            Console.OutputEncoding = Encoding.UTF8;
-
-            Console.Write("Введіть число N: ");
-            double n = Convert.ToDouble(Console.ReadLine());
-
-            Console.Write("Введіть відсоток P: ");
-            double p = Convert.ToDouble(Console.ReadLine());
-
-            double result = (p / 100) * n;
-            Console.WriteLine($"{p}% від числа {n} дорівнює {result}");
+            darkBook.InvokeRitual();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
         }
     }
 }
-
-//цельсії в фаренгейти і навпаки.
-using System;
-using System.Text;
-
-namespace ConsoleApp1
-{
-    internal class Program
-    {
-        static void Main()
-        {
-            Console.OutputEncoding = Encoding.UTF8;
-
-            Console.Write("Введіть температуру в Цельсіях: ");
-            double celsius = Convert.ToDouble(Console.ReadLine());
-            double fahrenheitFromCelsius = (celsius * 9 / 5) + 32;
-
-            Console.WriteLine($"{celsius}°C дорівнює {fahrenheitFromCelsius}°F");
-
-            Console.Write("Введіть температуру в Фаренгейтах: ");
-            double fahrenheit = Convert.ToDouble(Console.ReadLine());
-            double celsiusFromFahrenheit = (fahrenheit - 32) * 5 / 9;
-
-            Console.WriteLine($"{fahrenheit}°F дорівнює {celsiusFromFahrenheit}°C");
-        }
-    }
-}
-
