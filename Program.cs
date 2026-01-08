@@ -1,185 +1,154 @@
 ﻿using System;
-using System.Collections.Generic;
 
+#region SRP classes
 
-// Інтерфейси
-public interface ISpell
+// 1. ПІБ студента
+class PersonName
 {
-    void Cast();
-    int GetPower();
+    public string? FirstName { get; set; }
+    public string? Surname { get; set; }
+    public string? Lastname { get; set; }
 }
 
-// Додатковий інтерфейс для темної магії
-public interface IDarkMagic
+// 2. Адреса
+class Address
 {
-    void DarkEffect();
+    public string? Country { get; set; }
+    public string? Region { get; set; }
+    public string? City { get; set; }
+    public string? Street { get; set; }
+    public int HouseNumber { get; set; }
+    public char Korpus { get; set; }
+    public int PostalCode { get; set; }
 }
 
-// Generic spellbook
-public class Spellbook<T>
-    where T : class, ISpell, IComparable<T>, new()
+// 3. Дата народження
+class BirthInfo
 {
-    private List<T> spells = new List<T>();
-
-    // Вивчити нове закляття
-    public void LearnSpell(T spell)
-    {
-        foreach (var s in spells)
-        {
-            if (s.CompareTo(spell) == 0)
-            {
-                Console.WriteLine(" Закляття з такою силою вже вивчене!");
-                return;
-            }
-        }
-
-        spells.Add(spell);
-        Console.WriteLine($" Вивчено нове закляття (сила: {spell.GetPower()})");
-    }
-
-    // Сортування за силою
-    public void SortSpells()
-    {
-        spells.Sort();
-    }
-
-    // Кастування найсильнішого
-    public void CastStrongest()
-    {
-        if (spells.Count == 0)
-        {
-            Console.WriteLine("Книга порожня!");
-            return;
-        }
-
-        SortSpells();
-        var strongest = spells[^1];
-
-        Console.WriteLine("\n Кастуємо найсильніше закляття:");
-        strongest.Cast();
-    }
-
-    // Темний ритуал
-    public void InvokeRitual()
-    {
-        foreach (var spell in spells)
-        {
-            if (spell is not IDarkMagic)
-                throw new InvalidOperationException(
-                    " Ритуал неможливий! Не всі закляття є темною магією.");
-        }
-
-        Console.WriteLine("\n Темний ритуал розпочато...");
-        foreach (var spell in spells)
-        {
-            ((IDarkMagic)spell).DarkEffect();
-        }
-    }
+    public int Day { get; set; }
+    public int Month { get; set; }
+    public int Year { get; set; }
+    public string? ZodiacSign { get; set; }
 }
 
-
-// Закляття
-
-// Вогняна куля
-public class Fireball : ISpell, IComparable<Fireball>
+// 4. Навчальна інформація
+class EducationInfo
 {
-    public int Power { get; set; } = 70;
-
-    public void Cast()
-    {
-        Console.WriteLine(" Fireball: Вибух вогню!");
-    }
-
-    public int GetPower() => Power;
-
-    public int CompareTo(Fireball other)
-    {
-        return Power.CompareTo(other.Power);
-    }
+    public int StartDay { get; set; }
+    public int StartMonth { get; set; }
+    public int StartYear { get; set; }
+    public int Course { get; set; }
+    public string? GroupName { get; set; }
+    public string? Specialization { get; set; }
 }
 
-// Відновлення здоров'я
-public class HealingWave : ISpell, IComparable<HealingWave>
+// 5. Відвідування
+class Attendance
 {
-    public int Power { get; set; } = 40;
-
-    public void Cast()
-    {
-        Console.WriteLine(" Healing Wave: Відновлення здоровʼя!");
-    }
-
-    public int GetPower() => Power;
-
-    public int CompareTo(HealingWave other)
-    {
-        return Power.CompareTo(other.Power);
-    }
+    public int LessonsVisited { get; set; }
+    public int LessonsLate { get; set; }
 }
 
-// Темне закляття
-public class DarkSpell : ISpell, IDarkMagic, IComparable<DarkSpell>
+// 6. Оцінки
+class Grades
 {
-    public int Power { get; set; }
+    public int[]? HomeworkRates { get; set; }
+    public float HomeworkAverage { get; set; }
 
-    public DarkSpell()
-    {
-        Power = new Random().Next(80, 120);
-    }
+    public int[]? PracticeRates { get; set; }
+    public float PracticeAverage { get; set; }
 
-    public void Cast()
-    {
-        Console.WriteLine($" Темне закляття кастується (сила {Power})");
-    }
+    public int[]? ExamRates { get; set; }
+    public float ExamAverage { get; set; }
 
-    public void DarkEffect()
-    {
-        Console.WriteLine(" Темна енергія поглинає все навколо...");
-    }
+    public int[]? ZachetRates { get; set; }
+    public int ZachetCount { get; set; }
+    public float ZachetAverage { get; set; }
 
-    public int GetPower() => Power;
-
-    public int CompareTo(DarkSpell other)
-    {
-        return Power.CompareTo(other.Power);
-    }
+    public double TotalAverage { get; set; }
 }
 
+// 7. Предмет і викладач
+class SubjectInfo
+{
+    public string? SubjectName { get; set; }
+    public string? TeacherName { get; set; }
+}
 
-// Main
+#endregion
+
+#region Main Student class
+
+// Головний клас Student
+class Student
+{
+    public PersonName Name { get; set; } = new PersonName();
+    public Address Address { get; set; } = new Address();
+    public BirthInfo Birth { get; set; } = new BirthInfo();
+    public EducationInfo Education { get; set; } = new EducationInfo();
+    public Attendance Attendance { get; set; } = new Attendance();
+    public Grades Grades { get; set; } = new Grades();
+    public SubjectInfo Subject { get; set; } = new SubjectInfo();
+}
+
+#endregion
+
+#region Program
+
 class Program
 {
     static void Main()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-        Console.WriteLine("===  Звичайна книга заклять ===");
+        Student student = new Student();
 
-        var fireBook = new Spellbook<Fireball>();
-        fireBook.LearnSpell(new Fireball { Power = 60 });
-        fireBook.LearnSpell(new Fireball { Power = 80 });
-        fireBook.LearnSpell(new Fireball { Power = 80 }); // дубль
-        fireBook.LearnSpell(new Fireball { Power = 50 });
-        fireBook.LearnSpell(new Fireball { Power = 90 });
+        // ПІБ
+        student.Name.FirstName = "Максим";
+        student.Name.Surname = "Сергійович";
+        student.Name.Lastname = "Мандрика";
 
-        fireBook.CastStrongest();
+        // Адреса
+        student.Address.Country = "Україна";
+        student.Address.Region = "Харківська область";
+        student.Address.City = "Харків";
+        student.Address.Street = "Сумська";
+        student.Address.HouseNumber = 10;
+        student.Address.PostalCode = 61052;
 
-        Console.WriteLine("\n===  Книга темної магії ===");
+        // Дата народження
+        student.Birth.Day = 14;
+        student.Birth.Month = 2;
+        student.Birth.Year = 1982;
+        student.Birth.ZodiacSign = "Водолій";
 
-        var darkBook = new Spellbook<DarkSpell>();
-        darkBook.LearnSpell(new DarkSpell());
-        darkBook.LearnSpell(new DarkSpell());
-        darkBook.LearnSpell(new DarkSpell());
+        // Навчання
+        student.Education.Course = 2;
+        student.Education.GroupName = "СПР-411";
+        student.Education.Specialization = "Комп'ютерні науки";
 
-        darkBook.CastStrongest();
+        // Відвідування
+        student.Attendance.LessonsVisited = 120;
+        student.Attendance.LessonsLate = 3;
 
-        // Темний ритуал
-        try
-        {
-            darkBook.InvokeRitual();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
+        // Оцінки
+        student.Grades.TotalAverage = 9.6;
+
+        // Предмет
+        student.Subject.SubjectName = "Програмування";
+        student.Subject.TeacherName = "Загоруйко О.Д.";
+
+        // Вивід
+        Console.WriteLine("=== Дані студента ===");
+        Console.WriteLine($"{student.Name.Lastname} {student.Name.FirstName}");
+        Console.WriteLine($"Дата народження: {student.Birth.Day}.{student.Birth.Month}." +
+            $"{student.Birth.Year}р.");
+        Console.WriteLine($"Місто: {student.Address.City}");
+        Console.WriteLine($"Курс: {student.Education.Course}");
+        Console.WriteLine($"Середній бал: {student.Grades.TotalAverage}");
+        Console.WriteLine($"Предмет: {student.Subject.SubjectName}");
+        Console.WriteLine($"Викладач: {student.Subject.TeacherName}");
     }
 }
+
+#endregion
